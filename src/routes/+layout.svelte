@@ -20,7 +20,7 @@
 
 		<HeaderUtilities style="margin-left: auto;">
 			<HeaderGlobalAction>
-				<a href="https://github.com/your-username/your-repo" target="_blank">
+				<a href="https://github.com/SimonGonMon/the-music-lounge" target="_blank">
 					<LogoGithub class="h-6 w-6" style="fill: white;" />
 				</a>
 			</HeaderGlobalAction>
