@@ -8,7 +8,6 @@
 		InlineLoading,
 		Tile
 	} from 'carbon-components-svelte';
-	import { searchSong, searchArtist, searchAlbum } from '$lib/utils/spotify_api.js';
 
 	let selectedIndex = 0;
 	let value = '';
@@ -29,60 +28,54 @@
 	/**
 	 * @param {{ key: string; }} event
 	 */
-	async function handleKeyDown(event) {
-		if (event.key === 'Enter') {
-			hasSearched = true;
-			const searchQuery = value.trim();
-			if (searchQuery === '') {
-				error = 'Search query cannot be empty';
-				return;
-			}
-			loadingStatus = 'active';
-			error = '';
-			const selectedContent = ['song', 'artist', 'album'][selectedIndex];
-			try {
-				if (selectedContent === 'song') {
-					const result = await searchSong(searchQuery);
-					if (result.tracks.items.length === 0) {
-						error = 'Error searching for song';
-						loadingStatus = 'error';
-					} else {
-						// alert('Response received');
-						searchResults = result.tracks.items;
-						loadingStatus = 'finished';
-					}
-				} else if (selectedContent === 'artist') {
-					const response = await searchArtist(searchQuery);
-					if (response.artists.items.length === 0) {
-						error = 'Error searching for artist';
-						loadingStatus = 'error';
-					} else {
-						// alert('Response received');
-						searchResults = response.artists.items;
-						loadingStatus = 'finished';
-					}
-				} else if (selectedContent === 'album') {
-					const response = await searchAlbum(searchQuery);
-					if (response.error) {
-						error = 'Error searching for album';
-						loadingStatus = 'error';
-					} else {
-						// alert('Response received');
-						searchResults = [response.album];
-						songs = response.tracks;
-						loadingStatus = 'finished';
-					}
-				}
-			} catch (e) {
-				error = 'Error searching for content';
-				loadingStatus = 'error';
-			}
-
-			setTimeout(() => {
-				loadingStatus = 'inactive';
-			}, 3000);
+	 async function handleKeyDown(event) {
+	if (event.key === 'Enter') {
+		hasSearched = true;
+		const searchQuery = value.trim();
+		if (searchQuery === '') {
+			error = 'Search query cannot be empty';
+			return;
 		}
+		loadingStatus = 'active';
+		error = '';
+		const selectedContent = ['song', 'artist', 'album'][selectedIndex];
+		let endpoint = '';
+		if (selectedContent === 'song') {
+			endpoint = '/api/searchSong';
+		} else if (selectedContent === 'artist') {
+			endpoint = '/api/searchArtist';
+		} else if (selectedContent === 'album') {
+			endpoint = '/api/searchAlbum';
+		}
+
+		try {
+			const response = await fetch(`${endpoint}?q=${encodeURIComponent(searchQuery)}`);
+			const result = await response.json();
+			if (result.error) {
+				error = `Error searching for ${selectedContent}`;
+				loadingStatus = 'error';
+			} else {
+				if (selectedContent === 'song') {
+					searchResults = result.tracks.items;
+				} else if (selectedContent === 'artist') {
+					searchResults = result.artists.items;
+				} else if (selectedContent === 'album') {
+					searchResults = [result.album];
+					songs = result.tracks;
+				}
+				loadingStatus = 'finished';
+			}
+		} catch (e) {
+			error = 'Error searching for content';
+			loadingStatus = 'error';
+		}
+
+		setTimeout(() => {
+			loadingStatus = 'inactive';
+		}, 3000);
 	}
+}
+
 
 	/**
 	 * @param {number} duration_ms
