@@ -1,9 +1,9 @@
 import axios from 'axios';
-import { env } from '$env/dynamic/private';
+import {SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET} from '$env/static/private';
 
 async function getAccessToken() {
-    const spotify_client_id = env.SPOTIFY_CLIENT_ID;
-    const spotify_client_secret = env.SPOTIFY_CLIENT_SECRET;
+    const spotify_client_id = SPOTIFY_CLIENT_ID;
+    const spotify_client_secret = SPOTIFY_CLIENT_SECRET;
 
     const authOptions = {
         url: 'https://accounts.spotify.com/api/token',
