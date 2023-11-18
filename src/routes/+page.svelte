@@ -28,54 +28,53 @@
 	/**
 	 * @param {{ key: string; }} event
 	 */
-	 async function handleKeyDown(event) {
-	if (event.key === 'Enter') {
-		hasSearched = true;
-		const searchQuery = value.trim();
-		if (searchQuery === '') {
-			error = 'Search query cannot be empty';
-			return;
-		}
-		loadingStatus = 'active';
-		error = '';
-		const selectedContent = ['song', 'artist', 'album'][selectedIndex];
-		let endpoint = '';
-		if (selectedContent === 'song') {
-			endpoint = '/api/searchSong';
-		} else if (selectedContent === 'artist') {
-			endpoint = '/api/searchArtist';
-		} else if (selectedContent === 'album') {
-			endpoint = '/api/searchAlbum';
-		}
-
-		try {
-			const response = await fetch(`${endpoint}?q=${encodeURIComponent(searchQuery)}`);
-			const result = await response.json();
-			if (result.error) {
-				error = `Error searching for ${selectedContent}`;
-				loadingStatus = 'error';
-			} else {
-				if (selectedContent === 'song') {
-					searchResults = result.tracks.items;
-				} else if (selectedContent === 'artist') {
-					searchResults = result.artists.items;
-				} else if (selectedContent === 'album') {
-					searchResults = [result.album];
-					songs = result.tracks;
-				}
-				loadingStatus = 'finished';
+	async function handleKeyDown(event) {
+		if (event.key === 'Enter') {
+			hasSearched = true;
+			const searchQuery = value.trim();
+			if (searchQuery === '') {
+				error = 'Search query cannot be empty';
+				return;
 			}
-		} catch (e) {
-			error = 'Error searching for content';
-			loadingStatus = 'error';
+			loadingStatus = 'active';
+			error = '';
+			const selectedContent = ['song', 'artist', 'album'][selectedIndex];
+			let endpoint = '';
+			if (selectedContent === 'song') {
+				endpoint = '/api/searchSong';
+			} else if (selectedContent === 'artist') {
+				endpoint = '/api/searchArtist';
+			} else if (selectedContent === 'album') {
+				endpoint = '/api/searchAlbum';
+			}
+
+			try {
+				const response = await fetch(`${endpoint}?q=${encodeURIComponent(searchQuery)}`);
+				const result = await response.json();
+				if (result.error) {
+					error = `Error searching for ${selectedContent}`;
+					loadingStatus = 'error';
+				} else {
+					if (selectedContent === 'song') {
+						searchResults = result.tracks.items;
+					} else if (selectedContent === 'artist') {
+						searchResults = result.artists.items;
+					} else if (selectedContent === 'album') {
+						searchResults = [result.album];
+						songs = result.tracks;
+					}
+					loadingStatus = 'finished';
+				}
+			} catch (e) {
+				error = 'Error searching for content';
+				loadingStatus = 'error';
+			}
+
+			setTimeout(() => {
+				loadingStatus = 'inactive';
+			}, 3000);
 		}
-
-		setTimeout(() => {
-			loadingStatus = 'inactive';
-		}, 3000);
 	}
-}
-
 
 	/**
 	 * @param {number} duration_ms
